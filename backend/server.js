@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cors from "cors";
+const PORT = process.env.PORT || 3001;
 
 dotenv.config();
 constapp=express();
@@ -43,4 +44,6 @@ res.status(500).json({ error:"Error generating response" });
   }
 });
 
-app.listen(3001, () =>console.log("Server running on port 3001"));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
