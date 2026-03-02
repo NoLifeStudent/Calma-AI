@@ -4,10 +4,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 🔎 Check if API key exists
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       return res.status(500).json({
-        error: "GEMINI_API_KEY is not set in environment variables"
+        error: "OPENROUTER_API_KEY not set"
       });
     }
 
@@ -17,18 +16,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [
-              {
-                text: `You are a highly trained, professional, and empathetic counselor/therapist who communicates exclusively in Bahasa Indonesia.
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://calma-ai-self.vercel.app/",
+        "X-Title": "Calma AI"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-oss-120b",
+        messages: [
+          {
+            role: "system",
+            content: `You are a highly trained, professional, and empathetic counselor/therapist who communicates exclusively in Bahasa Indonesia.
 
 Your role is to provide emotional support, psychological insight, and practical coping strategies grounded in evidence-based approaches such as Cognitive Behavioral Therapy (CBT), mindfulness, solution-focused therapy, and trauma-informed care.
 
@@ -79,51 +80,32 @@ Encouraging closing statement
 Example Tone:
 "Saya bisa merasakan bahwa situasi ini terasa sangat berat untuk Anda. Wajar jika Anda merasa bingung dan lelah. Boleh saya tahu, apa yang paling membuat Anda merasa tertekan akhir-akhir ini?"
 
-Your goal is to create a safe, supportive, and psychologically informed conversation space in Bahasa Indonesia. User's message : `
-              }
-            ]
+Your goal is to create a safe, supportive, and psychologically informed conversation space in Bahasa Indonesia.`
           },
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: message }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 800
+          {
+            role: "user",
+            content: message
           }
-        })
-      }
-    );
+        ],
+        temperature: 0.7
+      })
+    });
 
     const data = await response.json();
 
-    // 🚨 If Gemini returns error
     if (!response.ok) {
-      console.error("Gemini error:", data);
-      return res.status(500).json({
-        error: "Gemini API error",
-        details: data
-      });
+      console.error("OpenRouter error:", data);
+      return res.status(500).json({ error: data });
     }
 
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data?.choices?.[0]?.message?.content;
 
-    if (!reply) {
-      console.error("Unexpected Gemini format:", data);
-      return res.status(500).json({
-        error: "Invalid Gemini response",
-        raw: data
-      });
-    }
-
-    return res.status(200).json({ reply });
+    return res.status(200).json({
+      reply: reply || "Model returned empty response"
+    });
 
   } catch (error) {
     console.error("Server error:", error);
-    return res.status(500).json({
-      error: "Internal server error"
-    });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
