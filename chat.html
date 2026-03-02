@@ -3,143 +3,192 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Calma Chat</title>
+<title>Calma AI - Chat</title>
 
 <style>
 body {
   margin: 0;
   font-family: Inter, sans-serif;
-  background: #0D0D0F;
+  background: #0f0f14;
   color: white;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-header {
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
   padding: 20px 40px;
 }
 
-header img {
+.header img {
   height: 50px;
 }
 
-.chat-container {
+/* CHAT WRAPPER */
+.chat-wrapper {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
-.chat-box {
-  width: 800px;
-  height: 500px;
-  background: #1A1A1D;
+/* CHAT CONTAINER (THE CARD) */
+.chat-container {
+  width: 900px;
+  height: 550px;
+  background: #18181f;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.6);
   overflow: hidden;
 }
 
+/* MESSAGES AREA */
 .messages {
   flex: 1;
-  padding: 20px;
+  padding: 25px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* MESSAGE BUBBLES */
 .message {
-  margin-bottom: 12px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  max-width: 70%;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .user {
-  text-align: right;
-  color: #B92185;
+  align-self: flex-end;
+  background: linear-gradient(135deg, #B92185, #8A3392);
+  color: white;
 }
 
 .bot {
-  text-align: left;
+  align-self: flex-start;
+  background: #2a2a35;
+  color: white;
 }
 
+/* INPUT AREA */
 .input-area {
   display: flex;
-  padding: 15px;
-  background: #111;
+  padding: 18px;
+  gap: 12px;
+  border-top: 1px solid #2f2f3a;
 }
 
 input {
   flex: 1;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  background: #222;
+  background: #2a2a35;
   color: white;
+  font-size: 14px;
+  outline: none;
 }
 
 button {
-  margin-left: 10px;
-  padding: 12px 20px;
-  border-radius: 20px;
+  padding: 14px 22px;
+  border-radius: 14px;
   border: none;
+  cursor: pointer;
+  font-weight: 600;
   background: linear-gradient(135deg, #B92185, #8A3392);
   color: white;
-  cursor: pointer;
 }
 
+button:hover {
+  opacity: 0.9;
+}
+
+/* POST SURVEY BUTTON */
 .post-btn {
   position: fixed;
   bottom: 30px;
-  right: 30px;
+  right: 40px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <img src="logo.png" />
-</header>
+<div class="header">
+  <img src="logo.png" alt="Calma Logo">
+</div>
 
-<div class="chat-container">
-  <div class="chat-box">
+<div class="chat-wrapper">
+  <div class="chat-container">
     <div class="messages" id="messages"></div>
+
     <div class="input-area">
-      <input id="userInput" placeholder="Tulis pesan Anda..." />
+      <input type="text" id="userInput" placeholder="Tulis pesan..." />
       <button onclick="sendMessage()">Kirim</button>
     </div>
   </div>
 </div>
 
-<a href="https://docs.google.com/forms/d/e/1FAIpQLSd77bhuG1NcYD9g1SvjJm9LLT9SIyTinY-gcenxl4OLtS1yWg/viewform?usp=publish-editor" target="_blank">
-  <button class="post-btn">Isi post-survey</button>
-</a>
+<button class="post-btn" onclick="openPostSurvey()">Isi Post-Survey</button>
 
 <script>
 const messages = document.getElementById("messages");
 const input = document.getElementById("userInput");
 
 function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.classList.add("message", sender);
-  div.innerText = text;
-  messages.appendChild(div);
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+  messages.appendChild(msg);
   messages.scrollTop = messages.scrollHeight;
 }
 
 async function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
+  const userText = input.value.trim();
+  if (!userText) return;
 
-  addMessage(text, "user");
+  addMessage(userText, "user");
   input.value = "";
 
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
+  const typing = document.createElement("div");
+  typing.classList.add("message", "bot");
+  typing.innerText = "Mengetik...";
+  messages.appendChild(typing);
+  messages.scrollTop = messages.scrollHeight;
 
-  const data = await response.json();
-  addMessage(data.reply || "Maaf terjadi kesalahan.", "bot");
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userText })
+    });
+
+    const data = await response.json();
+
+    messages.removeChild(typing);
+    addMessage(data.reply || "Tidak ada respon.", "bot");
+
+  } catch (error) {
+    messages.removeChild(typing);
+    addMessage("Terjadi kesalahan koneksi.", "bot");
+  }
+}
+
+input.addEventListener("keypress", function(e) {
+  if (e.key === "Enter") sendMessage();
+});
+
+function openPostSurvey() {
+  window.open("https://yohttps://docs.google.com/forms/d/e/1FAIpQLSd77bhuG1NcYD9g1SvjJm9LLT9SIyTinY-gcenxl4OLtS1yWg/viewform?usp=publish-editorur-post-survey-link.com", "_blank");
 }
 </script>
 
