@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calma Chat</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: #0D0D0F;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  padding: 20px 40px;
+}
+
+header img {
+  height: 50px;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-box {
+  width: 800px;
+  height: 500px;
+  background: #1A1A1D;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 12px;
+}
+
+.user {
+  text-align: right;
+  color: #B92185;
+}
+
+.bot {
+  text-align: left;
+}
+
+.input-area {
+  display: flex;
+  padding: 15px;
+  background: #111;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  background: #222;
+  color: white;
+}
+
+button {
+  margin-left: 10px;
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #B92185, #8A3392);
+  color: white;
+  cursor: pointer;
+}
+
+.post-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" />
+</header>
+
+<div class="chat-container">
+  <div class="chat-box">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input id="userInput" placeholder="Tulis pesan Anda..." />
+      <button onclick="sendMessage()">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSd77bhuG1NcYD9g1SvjJm9LLT9SIyTinY-gcenxl4OLtS1yWg/viewform?usp=publish-editor" target="_blank">
+  <button class="post-btn">Isi post-survey</button>
+</a>
+
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("userInput");
+
+function addMessage(text, sender) {
+  const div = document.createElement("div");
+  div.classList.add("message", sender);
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await response.json();
+  addMessage(data.reply || "Maaf terjadi kesalahan.", "bot");
+}
+</script>
+
+</body>
+</html>

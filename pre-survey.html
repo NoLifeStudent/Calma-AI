@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Calma - Landing</title>
+<title>Pre Survey</title>
 
 <style>
 body {
   margin: 0;
   font-family: Inter, sans-serif;
   background: #0D0D0F;
-  color: #FFFFFF;
+  color: white;
 }
 
 header {
@@ -24,26 +24,18 @@ header img {
 .center {
   height: 80vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-h1 {
-  color: #B92185;
-  font-size: 48px;
-  margin: 10px 0;
+.box {
+  max-width: 500px;
 }
 
 h2 {
-  font-size: 28px;
-  margin: 10px 0;
-}
-
-p {
-  opacity: 0.8;
-  margin-bottom: 40px;
+  color: #B92185;
+  margin-bottom: 30px;
 }
 
 .button {
@@ -53,11 +45,7 @@ p {
   font-weight: bold;
   background: linear-gradient(135deg, #B92185, #8A3392);
   color: white;
-  transition: 0.3s;
-}
-
-.button:hover {
-  opacity: 0.85;
+  display: inline-block;
 }
 </style>
 </head>
@@ -69,10 +57,12 @@ p {
 </header>
 
 <div class="center">
-  <h1>SELAMAT DATANG</h1>
-  <h2>WEBSITE KONSELING</h2>
-  <p>Chatbot AI untuk konseling mandiri</p>
-  <a href="pre-survey.html" class="button">MULAI SESI</a>
+  <div class="box">
+    <h2>Sebelum lanjut, silakan mengisi survey singkat berikut.</h2>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdqpGtNHTvIgRQodgRZWz0tMVomSH1kpFwxVNwW-fpo1O3YuQ/viewform?usp=header" target="_blank" class="button">ISI →</a>
+    <br><br>
+    <a href="chat.html" style="color:#B92185;">Lanjut ke Chat</a>
+  </div>
 </div>
 
 </body>
