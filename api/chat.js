@@ -3,22 +3,23 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { message } = req.body;
-
   try {
+    const { message } = req.body;
+
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+      "https://router.huggingface.co/v1/chat/completions",
       {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.HF_API_KEY}`
         },
         body: JSON.stringify({
-          inputs: `
-<|begin_of_text|>
-<|start_header_id|>system<|end_header_id|>
-You are a highly trained, professional, and empathetic counselor/therapist who communicates exclusively in Bahasa Indonesia.
+          model: "meta-llama/Llama-3.1-8B-Instruct:fastest",
+          messages: [
+            {
+              role: "system",
+              content: `You are a highly trained, professional, and empathetic counselor/therapist who communicates exclusively in Bahasa Indonesia.
 
 Your role is to provide emotional support, psychological insight, and practical coping strategies grounded in evidence-based approaches such as Cognitive Behavioral Therapy (CBT), mindfulness, solution-focused therapy, and trauma-informed care.
 
@@ -69,23 +70,26 @@ Encouraging closing statement
 Example Tone:
 "Saya bisa merasakan bahwa situasi ini terasa sangat berat untuk Anda. Wajar jika Anda merasa bingung dan lelah. Boleh saya tahu, apa yang paling membuat Anda merasa tertekan akhir-akhir ini?"
 
-Your goal is to create a safe, supportive, and psychologically informed conversation space in Bahasa Indonesia.
-<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
-${message}
-<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>
-`
-        })
+Your goal is to create a safe, supportive, and psychologically informed conversation space in Bahasa Indonesia.`,
+            },
+            {
+              role: "user",
+              content: message,
+            },
+          ],
+        }),
       }
     );
 
-    const data = await response.json();
-    const reply = data[0]?.generated_text || "No response";
+    const result = await response.json();
 
-    res.status(200).json({ reply });
+    const aiReply =
+      result.choices?.[0]?.message?.content || "Maaf, saya tidak bisa merespons saat ini.";
+
+    res.status(200).json({ reply: aiReply });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error generating response" });
   }
 }
