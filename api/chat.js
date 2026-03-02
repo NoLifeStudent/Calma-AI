@@ -6,8 +6,12 @@ export default async function handler(req, res) {
   try {
     const { message } = req.body;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -71,8 +75,7 @@ Example Tone:
 "Saya bisa merasakan bahwa situasi ini terasa sangat berat untuk Anda. Wajar jika Anda merasa bingung dan lelah. Boleh saya tahu, apa yang paling membuat Anda merasa tertekan akhir-akhir ini?"
 
 Your goal is to create a safe, supportive, and psychologically informed conversation space in Bahasa Indonesia. User's message : 
-${message}
-                  `
+${message}`
                 }
               ]
             }
@@ -81,16 +84,31 @@ ${message}
       }
     );
 
-    const data = await response.json();
+    const data = await geminiResponse.json();
 
-    const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Maaf, saya tidak dapat merespons saat ini.";
+    // 🔎 If Gemini returns an error
+    if (!geminiResponse.ok) {
+      console.error("Gemini API error:", data);
+      return res.status(500).json({
+        error: "Gemini API error",
+        details: data
+      });
+    }
+
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!reply) {
+      console.error("Unexpected Gemini response format:", data);
+      return res.status(500).json({
+        error: "Invalid Gemini response",
+        raw: data
+      });
+    }
 
     return res.status(200).json({ reply });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Error generating response" });
+    console.error("Server error:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
