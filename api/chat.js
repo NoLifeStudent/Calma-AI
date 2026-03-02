@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "X-Title": "Calma AI"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
+        model: "openrouter/free",
         messages: [
           {
             role: "system",
