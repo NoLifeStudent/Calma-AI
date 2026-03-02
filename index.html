@@ -59,6 +59,40 @@ p {
 .button:hover {
   opacity: 0.85;
 }
+/* TOP BAR */
+.top-bar {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+}
+
+.github-btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: linear-gradient(135deg, #B92185, #8A3392);
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.github-btn:hover {
+  opacity: 0.9;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 14px;
+  color: #888;
+}
+
+.footer strong {
+  color: #B92185;
+}
 </style>
 </head>
 
@@ -67,6 +101,11 @@ p {
 <header>
   <img src="logo.png" alt="Calma Logo" />
 </header>
+<div class="top-bar">
+  <a href="https://github.com/NoLifeStudent/Calma-AI" target="_blank" class="github-btn">
+    GitHub
+  </a>
+</div>
 
 <div class="center">
   <h1>SELAMAT DATANG</h1>
@@ -75,5 +114,10 @@ p {
   <a href="pre-survey.html" class="button">MULAI SESI</a>
 </div>
 
+<div class="footer">
+  <div>Made with passion</div>
+  <div><strong>Mirza Hakim</strong></div>
+  <div><strong>Hafid Alfianto</strong></div>
+</div>
 </body>
 </html>

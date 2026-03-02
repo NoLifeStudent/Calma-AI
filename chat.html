@@ -13,7 +13,7 @@ body {
   color: white;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 /* HEADER */
@@ -118,6 +118,40 @@ button:hover {
   bottom: 30px;
   right: 40px;
 }
+/* TOP BAR */
+.top-bar {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+}
+
+.github-btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: linear-gradient(135deg, #B92185, #8A3392);
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.github-btn:hover {
+  opacity: 0.9;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 14px;
+  color: #888;
+}
+
+.footer strong {
+  color: #B92185;
+}
 </style>
 </head>
 
@@ -125,6 +159,11 @@ button:hover {
 
 <div class="header">
   <img src="logo.png" alt="Calma Logo">
+</div>
+<div class="top-bar">
+  <a href="https://github.com/NoLifeStudent/Calma-AI" target="_blank" class="github-btn">
+    GitHub
+  </a>
 </div>
 
 <div class="chat-wrapper">
@@ -191,6 +230,10 @@ function openPostSurvey() {
   window.open("https://docs.google.com/forms/d/e/1FAIpQLSd77bhuG1NcYD9g1SvjJm9LLT9SIyTinY-gcenxl4OLtS1yWg/viewform?usp=publish-editorur-post-survey-link.com", "_blank");
 }
 </script>
-
+<div class="footer">
+  <div>Made with passion</div>
+  <div><strong>Mirza Hakim</strong></div>
+  <div><strong>Hafid Alfianto</strong></div>
+</div>
 </body>
 </html>
